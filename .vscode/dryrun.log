@@ -1,0 +1,11 @@
+make.exe --dry-run --keep-going --print-directory
+make: Entering directory 'c:/Users/finns/Documents/Coding/Embedded/ATTiny-Blink'
+avr-gcc -Wall -Os -mmcu=attiny48 -ffunction-sections -fdata-sections -I./TFT  -c minimac.c -o minimac.o
+avr-gcc -Wall -Os -mmcu=attiny48 -Wl,-gc-sections -o minimac.elf minimac.o
+avr-objcopy -j .text -j .data -O ihex minimac.elf minimac.hex
+ 
+avr-size minimac.elf
+rm *.o *.elf
+avrdude -p t48 -P COM18 -c avrisp -b 19200 -U flash:w:minimac.hex
+make: Leaving directory 'c:/Users/finns/Documents/Coding/Embedded/ATTiny-Blink'
+ 

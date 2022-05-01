@@ -1,0 +1,11 @@
+{
+    "makefile.extensionOutputFolder": "./.vscode",
+    "files.associations": {
+        "*.txt": "plaintext",
+        "*.fs": "fsharp",
+        "*.js": "javascript",
+        "*.html": "html",
+        "delay.h": "c",
+        "io.h": "c"
+    }
+}
