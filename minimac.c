@@ -31,17 +31,48 @@ int main() {
     SD_init();
 
     // Happy
-    PORTC = 0b1000;
+    // PORTC = 0x55;
+    // while (1) {
+    //     PORTC ^= 0xFF;
+    //     _delay_ms(200);
+    // }
+
+    //displayProg();
+
+    displayInit();
+
+    // uint8_t idx = 0;
+    // while (idx++ < 0b111111) {
+    //     _delay_ms(100);
+    //     PORTC = idx;
+    //     SD_readSectorHeader(idx);
+    // }
+
+
+    PORTC = SD_readSectorHeader(0);
+    for (uint16_t y = 0; y < 240; ++y) {
+        for (uint16_t x = 0; x < 320; ++x) {
+            uint16_t sdpix = SD_readSectorHeader((uint32_t)y * 320 + (uint32_t)x);
+            ili9341_drawpixel(x, y, sdpix);
+        }
+        PORTC = y;
+    }
+    while (1) {}
+
 
     return 0;
 }
 
-void displayProg() {
+void displayInit() {
     ili9341_init();//initial driver setup to drive ili9341
     ili9341_clear(BLUE);//fill screen with black colour
     _delay_ms(1000);
     ili9341_setRotation(3);//rotate screen
     _delay_ms(2);
+}
+
+void displayProg() {
+    displayInit();
 
 #define LINES 20
 

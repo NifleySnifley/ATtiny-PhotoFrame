@@ -10,7 +10,7 @@ if (len(argv) < 2):
     exit(1)
 
 infile = argv[1]
-outfile = argv[2] if len(argv) >= 3 else (infile.split(".")[0] + ".bin")
+outfile = argv[2] if len(argv) >= 3 else (infile.split(".")[1][1:] + ".bin")
 
 
 def outputPixel(img: Image.Image, x, y):
@@ -22,10 +22,12 @@ def outputPixel(img: Image.Image, x, y):
     g = floor((imagePixel[1]/255.0) * 63.99)
     b = floor((imagePixel[2]/255.0) * 31.99)
 
-    pa = (r & 0b11111000) | ((g & 0b111000) >> 3)
-    pb = ((g & 0b111) << 5) | (b)
-    outdata.append(pa)
+    pa = ((r & 0b11111) << 3) | ((g & 0b111000) >> 3)
+    pb = ((g & 0b111) << 5) | (b & 0b11111)
     outdata.append(pb)
+    outdata.append(pa)
+    for i in range(510):
+        outdata.append(0xFF)
 
 
 img = Image.open(infile)

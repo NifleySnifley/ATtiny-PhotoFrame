@@ -4,6 +4,7 @@
 #define SD_CS_PORT PORTD
 #define SD_CS_DDR DDRD
 #define SD_CS_PIN PD7
+#define SD_SECTOR_SIZE 512
 
 // SD card commands
 /** GO_IDLE_STATE - init card in spi mode if CS low */
@@ -19,4 +20,6 @@
 
 void SD_init();
 
-uint8_t SD_readByte();
+void SD_startSectorRead(uint32_t sector);
+uint8_t SD_readByteSector();
+void SD_endSectorRead();
