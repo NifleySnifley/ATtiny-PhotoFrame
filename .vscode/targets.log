@@ -8,7 +8,7 @@ make: *** No rule to make target 'all'.  Stop.
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Sat Apr 30 21:37:41 2022
+# Make data base, printed on Sun May 01 17:48:42 2022
 
 # Variables
 
@@ -56,6 +56,8 @@ VK_SDK_PATH = C:\VulkanSDK\1.2.198.1
 .VARIABLES := 
 # automatic
 %D = $(patsubst %/,%,$(patsubst %\,%,$(dir $%)))
+# makefile (from 'Makefile', line 3)
+OUTDIR = ./out
 # automatic
 ^D = $(patsubst %/,%,$(patsubst %\,%,$(dir $^)))
 # environment
@@ -98,7 +100,8 @@ COMMONPROGRAMW6432 = C:\Program Files\Common Files
 +D = $(patsubst %/,%,$(patsubst %\,%,$(dir $+)))
 # environment
 IDF_TOOLS_PATH = C:\Espressif
-# makefile (from 'Makefile', line 1)
+# makefile (from 'Makefile', line 1 
+)
 MAKEFILE_LIST := Makefile
 # automatic
 @F = $(notdir $@)
@@ -228,7 +231,8 @@ VSCODE_IPC_HOOK = \\.\pipe\3ffbe3728eacaa7f65fd7ebb90444c14-1.66.2-main-sock
 <F = $(notdir $<)
 # default
 SUFFIXES := 
-# environment
+# envir 
+onment
 ALLUSERSPROFILE = C:\ProgramData
 # environment
 SESSIONNAME = Console
@@ -239,7 +243,7 @@ PROCESSOR_REVISION = 5000
 # environment
 PROCESSOR_IDENTIFIER = AMD64 Family 25 Model 80 Stepping 0, AuthenticAMD
 # variable set hash-table stats:
-# Load=113/1024=11%, Rehash=0, Collisions=13/140=9%
+# Load=114/1024=11%, Rehash=0, Collisions=13/141=9%
 
 # Pattern-specific Variable Values
 
@@ -247,9 +251,9 @@ PROCESSOR_IDENTIFIER = AMD64 Family 25 Model 80 Stepping 0, AuthenticAMD
 
 # Directories
 
-# . (key c:/Users/finns/Documents/Coding/Embedded/ATTiny-Blink, mtime 1651359778): 10 files, no impossibilities.
+# . (key c:/Users/finns/Documents/Coding/Embedded/ATTiny-Blink, mtime 1651443305): 13 files, no impossibilities.
 
-# 10 files, no impossibilities in 1 directories.
+# 13 files, no impossibilities in 1 directories.
 
 # Implicit Rules
 
@@ -261,14 +265,14 @@ compile:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  recipe to execute (from 'Makefile', line 7):
-	${COMPILE} -ffunction-sections -fdata-sections -I./TFT  -c ${FILENAME}.c -o ${FILENAME}.o
-	${COMPILE} -Wl,-gc-sections -o ${FILENAME}.elf ${FILENAME}.o
-	avr-objcopy -j .text -j .data -O ihex ${FILENAME}.elf ${FILENAME}.hex
-	avr-size ${FILENAME}.elf
+#  recipe to execute (from 'Makefile', line 8):
+	${COMPILE} -ffunction-sections -fdata-sections -I./TFT  -c ${FILENAME}.c -o ${OUTDIR}/${FILENAME}.o
+	${COMPILE} -Wl,-gc-sections -o ${OUTDIR}/${FILENAME}.elf ${OUTDIR}/${FILENAME}.o
+	avr-objcopy -j .text -j .data -O ihex ${OUTDIR}/${FILENAME}.elf ${OUTDIR}/${FILENAME}.hex
+	avr-size ${OUTDIR}/${FILENAME}.elf
 	
 
-default: compile clean flash
+default: compile flash
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
@@ -276,23 +280,24 @@ default: compile clean flash
 # Not a target:
 Makefile:
 #  Implicit rule search has been done.
-#  Last modified 2022-04-30 18:03:12
+#  Last modified 2022-05-01 17:14:49
 #  File has been updated.
-#  Successfully updated.
+#  Successfully updat 
+ed.
 
 flash:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  recipe to execute (from 'Makefile', line 15):
-	avrdude -p t48 -P COM18 -c avrisp -b 19200 -U flash:w:${FILENAME}.hex
+#  recipe to execute (from 'Makefile', line 16):
+	avrdude -p t48 -P COM18 -c avrisp -b 19200 -U flash:w:${OUTDIR}/${FILENAME}.hex
 
 clean:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  recipe to execute (from 'Makefile', line 18):
-	rm *.o *.elf
+#  recipe to execute (from 'Makefile', line 19):
+	rm ${OUTDIR}/*
 
 # Not a target:
 .DEFAULT:
@@ -308,19 +313,19 @@ all:
 #  File has not been updated.
 
 # files hash-table stats:
-# Load=8/1024=1%, Rehash=0, Collisions=0/24=0%
+# Load=8/1024=1%, Rehash=0, Collisions=0/22=0%
 # VPATH Search Paths
 
 # No 'vpath' search paths.
 
 # No general ('VPATH' variable) search path.
 
-# strcache buffers: 1 (0) / strings = 17 / storage = 126 B / avg = 7 B
-# current buf: size = 8174 B / used = 126 B / count = 17 / avg = 7 B
+# strcache buffers: 1 (0) / strings = 20 / storage = 157 B / avg = 7 B
+# current buf: size = 8174 B / used = 157 B / count = 20 / avg = 7 B
 
-# strcache performance: lookups = 28 / hit rate = 39%
+# strcache performance: lookups = 30 / hit rate = 33%
 # hash-table stats:
-# Load=17/8192=0%, Rehash=0, Collisions=0/28=0%
-# Finished Make data base on Sat Apr 30 21:37:41 2022
+# Load=20/8192=0%, Rehash=0, Collisions=0/30=0%
+# Finished Make data base on Sun May 01 17:48:42 2022
 
  

@@ -1,18 +1,19 @@
 COMPILE = avr-gcc -Wall -Os -mmcu=attiny48
 FILENAME = minimac
+OUTDIR = ./out
 
-default: compile clean flash
+default: compile flash
 
 compile: 
-	${COMPILE} -ffunction-sections -fdata-sections -I./TFT  -c ${FILENAME}.c -o ${FILENAME}.o
+	${COMPILE} -ffunction-sections -fdata-sections -I./TFT  -c ${FILENAME}.c -o ${OUTDIR}/${FILENAME}.o
 # 	${COMPILE} -I./ili9341 -c ./ili9341/glcd.c -o glcd.o
 #	${COMPILE} -I./ili9341 -c ./ili9341/font.c -o font.o
-	${COMPILE} -Wl,-gc-sections -o ${FILENAME}.elf ${FILENAME}.o
-	avr-objcopy -j .text -j .data -O ihex ${FILENAME}.elf ${FILENAME}.hex
-	avr-size ${FILENAME}.elf
+	${COMPILE} -Wl,-gc-sections -o ${OUTDIR}/${FILENAME}.elf ${OUTDIR}/${FILENAME}.o
+	avr-objcopy -j .text -j .data -O ihex ${OUTDIR}/${FILENAME}.elf ${OUTDIR}/${FILENAME}.hex
+	avr-size ${OUTDIR}/${FILENAME}.elf
 	
 flash:
-	avrdude -p t48 -P COM18 -c avrisp -b 19200 -U flash:w:${FILENAME}.hex
+	avrdude -p t48 -P COM18 -c avrisp -b 19200 -U flash:w:${OUTDIR}/${FILENAME}.hex
 
 clean:
-	rm *.o *.elf
+	rm ${OUTDIR}/*

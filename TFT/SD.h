@@ -18,8 +18,20 @@
 #define SD_CMD55	(0x40+55)	/* APP_CMD */
 #define SD_CMD58	(0x40+58)	/* READ_OCR */
 
+void SD_CS_high();
+
+void SD_CS_low();
+
+void SD_waitForResponse(uint8_t* response, uint8_t target);
+
 void SD_init();
 
 void SD_startSectorRead(uint32_t sector);
+
 uint8_t SD_readByteSector();
+
 void SD_endSectorRead();
+
+uint16_t SD_readSectorHeader(uint32_t sector);
+
+void SD_hard_init();

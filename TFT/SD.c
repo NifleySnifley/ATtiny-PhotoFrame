@@ -116,6 +116,7 @@ skipCMD8:
 
     PORTC = 0b10000;
 
+
 step6:
     // Send CMD55 to ready the card for a application-specific command
     response = SD_send_cmd(SD_CMD55, 0);
@@ -140,7 +141,9 @@ step6:
         _delay_us(10);
     }
 
+
     PORTC = 0b110000;
+
 
     response = SD_send_cmd(SD_CMD1, 0x40000000);
     while (response != 0x0) {
@@ -151,6 +154,7 @@ step6:
 
 
     PORTC = 0xFF;
+
 
     spi_send(0xFF);
     SD_CS_high(); // Done using SD for now
@@ -197,4 +201,17 @@ uint16_t SD_readSectorHeader(uint32_t sector) {
     while (sbl--) spi_send(0xFF); // Read rest of sector
     SD_endSectorRead();
     return res;
+}
+
+void SD_readSectorPartial(uint32_t sector, uint16_t start, uint16_t end, uint8_t* buf) {
+    SD_startSectorRead(sector);
+    for (uint16_t s = start; s; --s) SD_readByteSector();
+    for (uint16_t r = 0; r < (end - start); ++r) buf[r] = SD_readByteSector();
+    for (uint16_t s = end; s < 512; ++s) SD_readByteSector();
+    SD_endSectorRead();
+}
+
+void SD_hard_init() {
+    SD_CS_DDR |= _BV(SD_CS_PIN);
+    SD_CS_high(); // Unselect SD card
 }

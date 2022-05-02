@@ -1,5 +1,6 @@
 #include "ili9341.h"
 #include "ili9341cmd.h"
+#include <stdlib.h>
 
 volatile uint16_t LCD_W = ILI9341_TFTWIDTH;
 volatile uint16_t LCD_H = ILI9341_TFTHEIGHT;
@@ -13,7 +14,7 @@ void ili9341_hard_init(void) {
 
 //set spi speed and settings 
 void spi_init(void) {
-    DDRB |= (1 << 1) | (1 << 2) | (1 << 3) | (1 << 5);//CS,SS,MOSI,SCK as output(although SS will be unused throughout the program)
+    DDRB |= _BV(1) | _BV(2) | _BV(3) | _BV(5);//CS,SS,MOSI,SCK as output(although SS will be unused throughout the program)
     SPCR = (1 << SPE) | (1 << MSTR);//mode 0,fosc/4
     SPSR |= (1 << SPI2X);//doubling spi speed.i.e final spi speed-fosc/2
     PORTB |= (1 << 1);//cs off during startup

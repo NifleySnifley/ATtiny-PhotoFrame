@@ -6,62 +6,8 @@
 #include "ili9341.c"
 #include "SD.c"
 
-// void tft_drawimage(const char* fname) {
-//     // ili9341_setaddress(x, y, x + w - 1, y + h - 1);
-
-//     // for (y = h; y > 0; y--) {
-//     //     for (x = w; x > 0; x--) {
-//     //         ili9341_pushcolour(colour);
-//     //     }
-//     // }
-// }
-
-int main() {
-    CLKPR = 0x80;	// Sets CPU pre-scaler to 1 (8MHz)
-    CLKPR = 0x00;	//Second operation in setting CPU pre-scaler to 1
-
-    spi_init();
-    SD_CS_DDR |= _BV(SD_CS_PIN);
-    SD_CS_high(); // Unselect SD card
-
-    // PORTC debugging port
-    DDRC = 0xFF;
-    PORTC = 0b1;
-
-    SD_init();
-
-    // Happy
-    // PORTC = 0x55;
-    // while (1) {
-    //     PORTC ^= 0xFF;
-    //     _delay_ms(200);
-    // }
-
-    //displayProg();
-
-    displayInit();
-
-    // uint8_t idx = 0;
-    // while (idx++ < 0b111111) {
-    //     _delay_ms(100);
-    //     PORTC = idx;
-    //     SD_readSectorHeader(idx);
-    // }
-
-
-    PORTC = SD_readSectorHeader(0);
-    for (uint16_t y = 0; y < 240; ++y) {
-        for (uint16_t x = 0; x < 320; ++x) {
-            uint16_t sdpix = SD_readSectorHeader((uint32_t)y * 320 + (uint32_t)x);
-            ili9341_drawpixel(x, y, sdpix);
-        }
-        PORTC = y;
-    }
-    while (1) {}
-
-
-    return 0;
-}
+#define N_PIXELS_BUFFERED 64
+static uint16_t pixbuf[N_PIXELS_BUFFERED];
 
 void displayInit() {
     ili9341_init();//initial driver setup to drive ili9341
@@ -125,4 +71,43 @@ uint16_t readADC(uint8_t ch) {
     while (ADCSRA & (1 << ADSC));
 
     return (ADC);
+}
+
+int main() {
+    CLKPR = 0x80;	// Sets CPU pre-scaler to 1 (8MHz)
+    CLKPR = 0x00;	//Second operation in setting CPU pre-scaler to 1
+
+    // PORTC debugging port
+    DDRC = 0xFF;
+    PORTC = 0b1;
+
+    spi_init();
+    SD_hard_init();
+
+
+    SD_init();
+
+
+    displayInit();
+
+    uint8_t pixels_wrote = N_PIXELS_BUFFERED;
+    uint16_t current_sector = 0;
+    for (uint16_t y = 0; y < 240; ++y) {
+        for (uint16_t x = 0; x < 320; ++x) {
+            // Need to read more pixels into the buffer
+            if (pixels_wrote == N_PIXELS_BUFFERED) {
+                pixels_wrote = 0;
+                //SD_readSectorHeader((uint32_t)y * 320 + (uint32_t)x)
+                SD_readSectorPartial(current_sector++, 0, N_PIXELS_BUFFERED * sizeof(uint16_t), (uint8_t*)&pixbuf);
+            }
+            uint16_t sdpix = pixbuf[pixels_wrote++];
+            ili9341_drawpixel(x, y, sdpix);
+        }
+        PORTC = y;
+    }
+
+    while (1) {}
+
+
+    return 0;
 }
