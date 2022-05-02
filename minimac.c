@@ -92,22 +92,20 @@ int main() {
 
     uint8_t pixels_wrote = N_PIXELS_BUFFERED;
     uint16_t current_sector = 0;
-    for (uint16_t y = 0; y < 240; ++y) {
-        for (uint16_t x = 0; x < 320; ++x) {
-            // Need to read more pixels into the buffer
-            if (pixels_wrote == N_PIXELS_BUFFERED) {
-                pixels_wrote = 0;
-                //SD_readSectorHeader((uint32_t)y * 320 + (uint32_t)x)
-                SD_readSectorPartial(current_sector++, 0, N_PIXELS_BUFFERED * sizeof(uint16_t), (uint8_t*)&pixbuf);
-            }
-            uint16_t sdpix = pixbuf[pixels_wrote++];
-            ili9341_drawpixel(x, y, sdpix);
+    ili9341_setaddress(0, 0, 320, 240);
+    for (uint32_t a = 0; a < (240UL * 320UL); ++a) {
+        // Need to read more pixels into the buffer?
+        if (pixels_wrote == N_PIXELS_BUFFERED) {
+            pixels_wrote = 0;
+            PORTC = current_sector;
+            SD_readSectorPartial(current_sector++, 0, N_PIXELS_BUFFERED * sizeof(uint16_t), (uint8_t*)&pixbuf);
         }
-        PORTC = y;
+        ili9341_pushcolour(pixbuf[pixels_wrote++]);
     }
 
-    while (1) {}
-
+    // Happy dance!
+    PORTC = 0x55;
+    while (1) { PORTC ^= 0xFF; _delay_ms(200); }
 
     return 0;
 }

@@ -81,7 +81,7 @@ void SD_init() {
     SD_waitForResponse(&response, 0x1);
 
 
-    PORTC = 0b100; // Card in idle
+    // PORTC = 0b100; // Card in idle
 
 
     response = SD_send_cmd(SD_CMD8, 0x1AA);
@@ -98,7 +98,7 @@ void SD_init() {
 skipCMD8:
 
 
-    PORTC = 0b1000;
+    // PORTC = 0b1000;
 
 
     uint32_t OCR;
@@ -114,7 +114,7 @@ skipCMD8:
     // else return;
 
 
-    PORTC = 0b10000;
+    // PORTC = 0b10000;
 
 
 step6:
@@ -126,7 +126,7 @@ step6:
     }
 
 
-    PORTC = 0b100000;
+    // PORTC = 0b100000;
 
 
     response = SD_send_cmd(SD_ACMD41, 0x40000000);
@@ -142,7 +142,7 @@ step6:
     }
 
 
-    PORTC = 0b110000;
+    // PORTC = 0b110000;
 
 
     response = SD_send_cmd(SD_CMD1, 0x40000000);
@@ -153,7 +153,7 @@ step6:
     }
 
 
-    PORTC = 0xFF;
+    // PORTC = 0xFF;
 
 
     spi_send(0xFF);
