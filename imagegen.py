@@ -3,7 +3,6 @@ from PIL import Image
 from sys import argv
 
 from matplotlib import image
-outdata = bytearray()
 
 if (len(argv) < 2):
     print("Input filename must be specified")
@@ -14,11 +13,11 @@ outfile = argv[2] if len(argv) >= 3 else (infile.split(".")[1][1:] + ".bin")
 
 
 # Pixels per sector, <pps> pixels are wrote and then the rest of the sector (512 bytes) is filled with ones
-pps = 64
+pps = 128
 sectorPixelCount = 0
 
 
-def outputPixel(img: Image.Image, x, y):
+def outputPixel(img: Image.Image, x, y, outdata):
     global sectorPixelCount
 
     # R (5 bits)   G (6 bits)  B (5 bits)
@@ -40,12 +39,13 @@ def outputPixel(img: Image.Image, x, y):
             outdata.append(0xFF)
 
 
+dout = bytearray()
 img = Image.open(infile)
 img = img.convert("RGB")
 for y in range(0, img.height):
     for x in range(0, img.width):
-        outputPixel(img, x, y)
+        outputPixel(img, x, y, dout)
 
 
 with open(outfile, "wb") as f:
-    f.write(outdata)
+    f.write(dout)

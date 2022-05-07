@@ -1,17 +1,6 @@
 #include "SD.h"
 #include <util/delay.h>
 
-uint8_t spi_transaction(uint8_t data) {
-    SPDR = data; // Data to TX in SPDR
-    while (!(SPSR & (1 << SPIF))); // Wait for completion
-    return SPDR; // RX'd data is back in SPDR
-}
-
-void spi_send(uint8_t data) {
-    SPDR = data; // Data to TX in SPDR
-    while (!(SPSR & (1 << SPIF))); // Wait for completion
-}
-
 uint8_t SD_send_cmd(uint8_t cmd, uint32_t arg) {
     uint8_t crc;
 
@@ -30,24 +19,6 @@ uint8_t SD_send_cmd(uint8_t cmd, uint32_t arg) {
     return spi_transaction(crc);            // Send CRC
 }
 
-// uint32_t SD_send_cmd_res32(uint8_t cmd, uint32_t arg) {
-//     uint8_t crc, rshiftctr;
-//     uint32_t result;
-
-//     /* Send command packet */
-//     spi_send(cmd);						    /* Start + Command index */
-//     spi_transaction((uint8_t)(arg >> 24));		    /* Argument[31..24] */
-//     spi_transaction((uint8_t)(arg >> 16));		    /* Argument[23..16] */
-//     spi_transaction((uint8_t)(arg >> 8));			/* Argument[15..8] */
-//     spi_transaction((uint8_t)arg);				    /* Argument[7..0] */
-//     crc = 0x01;							    /* Dummy CRC + Stop */
-//     if (cmd == SD_CMD0) crc = 0x95;			// CRC for CMD0(0)
-//     if (cmd == SD_CMD8) crc = 0x87;			// CRC for CMD8(0x1AA)
-//     if (cmd == SD_CMD58) crc = 0xFD;        // CRC for CMD58(0)
-//     spi_transaction(crc);                   // Send CRC
-//     return result;
-// }
-
 void SD_CS_high() {
     SD_CS_PORT |= _BV(SD_CS_PIN);
 }
@@ -61,27 +32,30 @@ void SD_waitForResponse(uint8_t* response, uint8_t target) {
         *response = spi_transaction(0xFF); // Keep asking for response
         //_delay_us(1);
     }
+    // while (1) PORTB = 1;
 }
 
 void SD_init() {
     // Wait
+    DEBUG(1);
     _delay_ms(1);
     SD_CS_high();
 
     // Clock pulses (12*8)
-    for (uint8_t i = 0; i < 12; ++i) {
+    for (uint8_t i = 0; i < 20; ++i) {
         spi_send(0xFF);
     }
 
     // Software reset
     SD_CS_low();
+    DEBUG(0x10);
 
     // Ask for idle state
     uint8_t response = SD_send_cmd(SD_CMD0, 0);
     SD_waitForResponse(&response, 0x1);
 
 
-    // PORTC = 0b100; // Card in idle
+    DEBUG(0b100); // Card in idle
 
 
     response = SD_send_cmd(SD_CMD8, 0x1AA);
@@ -98,7 +72,7 @@ void SD_init() {
 skipCMD8:
 
 
-    // PORTC = 0b1000;
+    DEBUG(0b1000);
 
 
     uint32_t OCR;
@@ -114,7 +88,7 @@ skipCMD8:
     // else return;
 
 
-    // PORTC = 0b10000;
+    DEBUG(0b10000);
 
 
 step6:
@@ -126,7 +100,7 @@ step6:
     }
 
 
-    // PORTC = 0b100000;
+    DEBUG(0b100000);
 
 
     response = SD_send_cmd(SD_ACMD41, 0x40000000);
@@ -142,7 +116,7 @@ step6:
     }
 
 
-    // PORTC = 0b110000;
+    DEBUG(0b110000);
 
 
     response = SD_send_cmd(SD_CMD1, 0x40000000);
@@ -153,11 +127,12 @@ step6:
     }
 
 
-    // PORTC = 0xFF;
+    DEBUG(0xFF);
 
 
     spi_send(0xFF);
     SD_CS_high(); // Done using SD for now
+    spi_send(0xFF); // Finish it
     spi_send(0xFF); // Finish it
 }
 
@@ -207,7 +182,7 @@ void SD_readSectorPartial(uint32_t sector, uint16_t start, uint16_t end, uint8_t
     SD_startSectorRead(sector);
     for (uint16_t s = start; s; --s) SD_readByteSector();
     for (uint16_t r = 0; r < (end - start); ++r) buf[r] = SD_readByteSector();
-    for (uint16_t s = end; s < 512; ++s) SD_readByteSector();
+    for (uint16_t s = end; s < 512U; ++s) SD_readByteSector();
     SD_endSectorRead();
 }
 

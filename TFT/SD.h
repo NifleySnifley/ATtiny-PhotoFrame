@@ -1,10 +1,24 @@
 #include <stdint.h>
 #include <avr/io.h>
 
+#if defined(__AVR_ATtiny48__)
+
 #define SD_CS_PORT PORTD
 #define SD_CS_DDR DDRD
 #define SD_CS_PIN PD7
-#define SD_SECTOR_SIZE 512
+
+#elif defined(__AVR_ATtiny84__)
+
+#define SD_CS_PORT PORTA
+#define SD_CS_DDR DDRA
+#define SD_CS_PIN PA3
+
+#endif
+
+
+
+
+#define SD_SECTOR_SIZE 512UL
 
 // SD card commands
 /** GO_IDLE_STATE - init card in spi mode if CS low */

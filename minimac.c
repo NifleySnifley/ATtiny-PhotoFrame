@@ -1,13 +1,27 @@
 #define F_CPU 8000000
 
+
+#ifdef __AVR_ATtiny48__
+#define DEBUG(x) PORTC = x;
+#else
+#define DEBUG(x) 
+#endif
+
 #include <avr/io.h>
 #include <util/delay.h>
+#include "SPI.c"
 
 #include "ili9341.c"
 #include "SD.c"
 
+
+#if defined(__AVR_ATtiny48__)
 #define N_PIXELS_BUFFERED 64
-static uint16_t pixbuf[N_PIXELS_BUFFERED];
+#elif defined(__AVR_ATtiny84__)
+#define N_PIXELS_BUFFERED 128
+#endif
+
+uint16_t pixbuf[N_PIXELS_BUFFERED];
 
 void displayInit() {
     ili9341_init();//initial driver setup to drive ili9341
@@ -73,39 +87,89 @@ uint16_t readADC(uint8_t ch) {
     return (ADC);
 }
 
+// int main() {
+//     CLKPR = 0x80;	// Sets CPU pre-scaler to 1 (8MHz)
+//     CLKPR = 0x00;	//Second operation in setting CPU pre-scaler to 1
+
+//     spi_hard_init();
+//     spi_init();
+//     //ili9341_hard_init();
+//     SD_hard_init();
+//     SD_init();
+
+
+//     DDRB |= _BV(PB0);
+//     PORTB |= _BV(PB0);
+
+//     // displayProg();
+
+
+//     // while (1) {
+//     //     PORTB ^= 0xFF;
+//     //     SD_CS_low();
+//     //     spi_send(0xF0);
+//     //     SD_CS_high();
+//     //     _delay_ms(200);
+//     // }
+
+//     while (1) {}
+
+//     return 0;
+// }
+
 int main() {
     CLKPR = 0x80;	// Sets CPU pre-scaler to 1 (8MHz)
     CLKPR = 0x00;	//Second operation in setting CPU pre-scaler to 1
 
+    DDRB |= _BV(PB0);
+    PORTB &= ~_BV(PB0);
+
+
     // PORTC debugging port
+#ifdef __AVR_ATtiny48__
     DDRC = 0xFF;
     PORTC = 0b1;
+#endif
 
+    spi_hard_init();
+    ili9341_hard_init();
     spi_init();
-    SD_hard_init();
 
+    SD_hard_init();
 
     SD_init();
 
 
     displayInit();
 
+
+    // displayProg();
+
+
     uint8_t pixels_wrote = N_PIXELS_BUFFERED;
     uint16_t current_sector = 0;
     ili9341_setaddress(0, 0, 320, 240);
+
     for (uint32_t a = 0; a < (240UL * 320UL); ++a) {
         // Need to read more pixels into the buffer?
         if (pixels_wrote == N_PIXELS_BUFFERED) {
-            pixels_wrote = 0;
-            PORTC = current_sector;
             SD_readSectorPartial(current_sector++, 0, N_PIXELS_BUFFERED * sizeof(uint16_t), (uint8_t*)&pixbuf);
+            PORTB ^= _BV(PB0);
+            pixels_wrote = 0;
+            // DEBUG(current_sector);
         }
         ili9341_pushcolour(pixbuf[pixels_wrote++]);
     }
 
     // Happy dance!
-    PORTC = 0x55;
-    while (1) { PORTC ^= 0xFF; _delay_ms(200); }
+    // uint8_t dbg = 0x55;
+    // while (1) {
+    //     dbg ^= 0xFF;
+    //     DEBUG(dbg);
+    //     _delay_ms(200);
+    // }
+
+    while (1) {}
 
     return 0;
 }

@@ -7,40 +7,28 @@ volatile uint16_t LCD_H = ILI9341_TFTHEIGHT;
 
 //init hardware
 void ili9341_hard_init(void) {
-    rstddr = 0xFF;//output for reset
-    rstport |= (1 << rst);//pull high for normal operation
-    controlddr |= (1 << dc);//D/C as output
-}
-
-//set spi speed and settings 
-void spi_init(void) {
-    DDRB |= _BV(1) | _BV(2) | _BV(3) | _BV(5);//CS,SS,MOSI,SCK as output(although SS will be unused throughout the program)
-    SPCR = (1 << SPE) | (1 << MSTR);//mode 0,fosc/4
-    SPSR |= (1 << SPI2X);//doubling spi speed.i.e final spi speed-fosc/2
-    PORTB |= (1 << 1);//cs off during startup
-}
-
-//send spi data to display
-void ili9341_spi_send(unsigned char spi_data) {
-    SPDR = spi_data;//move data into spdr
-    while (!(SPSR & (1 << SPIF)));//wait till the transmission is finished
+    // DDRB |= _BV(1) | _BV(2);
+    ili9341_controlddr |= _BV(ili9341_cs) | _BV(ili9341_dc);
+    ili9341_controlport |= _BV(ili9341_cs); // CS high
+    ili9341_rstddr |= _BV(ili9341_rst);//output for reset
+    ili9341_rstport |= (1 << ili9341_rst);//pull high for normal operation
 }
 
 //command write
 void ili9341_writecommand8(uint8_t com) {
-    controlport &= ~((1 << dc) | (1 << cs));//dc and cs both low to send command
+    ili9341_controlport &= ~((1 << ili9341_dc) | (1 << ili9341_cs));//ili9341_dc and ili9341_cs both low to send command
     _delay_us(5);//little delay
-    ili9341_spi_send(com);
-    controlport |= (1 << cs);//pull high cs
+    spi_send(com);
+    ili9341_controlport |= (1 << ili9341_cs);//pull high ili9341_cs
 }
 
 //data write
 void ili9341_writedata8(uint8_t data) {
-    controlport |= (1 << dc);//st dc high for data
+    ili9341_controlport |= (1 << ili9341_dc);//st ili9341_dc high for data
     _delay_us(1);//delay
-    controlport &= ~(1 << cs);//set cs low for operation
-    ili9341_spi_send(data);
-    controlport |= (1 << cs);
+    ili9341_controlport &= ~(1 << ili9341_cs);//set ili9341_cs low for operation
+    spi_send(data);
+    ili9341_controlport |= (1 << ili9341_cs);
 }
 
 //set coordinate for print or other function
@@ -62,11 +50,11 @@ void ili9341_setaddress(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2) {
 
 //hard reset display
 void ili9341_hard_reset(void) {
-    rstport |= (1 << rst);//pull high if low previously
+    ili9341_rstport |= (1 << ili9341_rst);//pull high if low previously
     _delay_ms(200);
-    rstport &= ~(1 << rst);//low for reset
+    ili9341_rstport &= ~(1 << ili9341_rst);//low for reset
     _delay_ms(200);
-    rstport |= (1 << rst);//again pull high for normal operation
+    ili9341_rstport |= (1 << ili9341_rst);//again pull high for normal operation
     _delay_ms(200);
 }
 

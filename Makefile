@@ -1,4 +1,5 @@
-COMPILE = avr-gcc -Wall -Os -mmcu=attiny48
+MCU = 84
+COMPILE = avr-gcc -Wall -Os -mmcu=attiny${MCU}
 FILENAME = minimac
 OUTDIR = ./out
 
@@ -13,7 +14,9 @@ compile:
 	avr-size ${OUTDIR}/${FILENAME}.elf
 	
 flash:
-	avrdude -p t48 -P COM18 -c avrisp -b 19200 -U flash:w:${OUTDIR}/${FILENAME}.hex
+	avrdude -p t${MCU} -P COM18 -c avrisp -b 19200 -U flash:w:${OUTDIR}/${FILENAME}.hex
 
 clean:
-	rm ${OUTDIR}/*
+	rm ${OUTDIR}/${filename}.elf
+	rm ${OUTDIR}/${filename}.o
+	rm ${OUTDIR}/${filename}.hex

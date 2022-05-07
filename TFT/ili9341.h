@@ -7,19 +7,8 @@
 #include<limits.h>
 #include<inttypes.h>
 
-#define controlport PORTB
-#define controlddr DDRB
-#define controlpin PINB
-#define rstport PORTD
-#define rstddr DDRD
-#define rstpin PIND
-#define dc 0
-#define cs 1
-#define rst 7
 #define ILI9341_TFTHEIGHT 240 
 #define ILI9341_TFTWIDTH 320
-
-
 
 
 #define BLACK       0x0000      
@@ -47,8 +36,6 @@
 
 
 void ili9341_hard_init(void);
-void ili9341_spi_init(void);
-void ili9341_spi_send(unsigned char spi_data);
 void ili9341_writecommand8(uint8_t com);
 void ili9341_writedata8(uint8_t data);
 void ili9341_setaddress(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2);

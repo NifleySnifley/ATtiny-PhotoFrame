@@ -10,7 +10,7 @@
             "compilerArgs": [
                 "-Wall ",
                 "-Os ",
-                "-mmcu=attiny48"
+                "-mmcu=attiny84"
             ],
             "intelliSenseMode": "gcc-x86"
         }
