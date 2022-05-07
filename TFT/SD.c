@@ -178,11 +178,19 @@ uint16_t SD_readSectorHeader(uint32_t sector) {
     return res;
 }
 
-void SD_readSectorPartial(uint32_t sector, uint16_t start, uint16_t end, uint8_t* buf) {
+void SD_readSectorRegion(uint32_t sector, uint16_t start, uint16_t end, uint8_t* buf) {
     SD_startSectorRead(sector);
     for (uint16_t s = start; s; --s) SD_readByteSector();
     for (uint16_t r = 0; r < (end - start); ++r) buf[r] = SD_readByteSector();
     for (uint16_t s = end; s < 512U; ++s) SD_readByteSector();
+    SD_endSectorRead();
+}
+
+void SD_readSectorN(uint32_t sector, uint16_t offset, uint16_t nbytes, uint8_t* buf) {
+    SD_startSectorRead(sector);
+    for (uint16_t s = offset; s; --s) SD_readByteSector();
+    for (uint16_t r = 0; r < nbytes; ++r) buf[r] = SD_readByteSector();
+    for (uint16_t s = offset + nbytes; s < 512U; ++s) SD_readByteSector();
     SD_endSectorRead();
 }
 
