@@ -1,5 +1,11 @@
-/.vscode
 /out/
 __pycache__/
 *.bin
 *.png
+
+# Created by https://www.gitignore.io/api/visualstudiocode
+# Edit at https://www.gitignore.io/?templates=visualstudiocode
+
+### VisualStudioCode ###
+# .vscode/
+.vscode/*.log
